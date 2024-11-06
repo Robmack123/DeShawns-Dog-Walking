@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDogs } from "./apiManager";
-import "./DogList.css";
+import "./styling/DogList.css";
 import { DogDetails } from "./DogDetails";
 
 export const Dogs = () => {
