@@ -110,7 +110,11 @@ app.MapGet("/api/dogs", () =>
         Id = d.Id,
         Name = d.Name,
         CityId = d.CityId,
-        WalkerId = d.WalkerId ?? 0 
+        CityName = cities.FirstOrDefault(c => c.Id == d.CityId)?.Name,
+        WalkerId = d.WalkerId ?? 0,
+        WalkerName = d.WalkerId != null
+            ? walkers.FirstOrDefault(w => w.Id == d.WalkerId)?.Name
+            : "No walker assigned"
     }).ToList();
 });
 app.Run();
