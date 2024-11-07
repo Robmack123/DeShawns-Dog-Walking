@@ -117,4 +117,24 @@ app.MapGet("/api/dogs", () =>
             : "No walker assigned"
     }).ToList();
 });
+
+app.MapGet("/api/cities", () => 
+{
+    return cities.Select(c => new { c.Id, c.Name }).ToList();
+});
+
+app.MapPost("/api/dogs", (DogDTO newDog) =>
+{
+    int newId = dogs.Max(d => d.Id) + 1;
+    var dog = new Dog
+    {
+        Id = newId,
+        Name = newDog.Name,
+        CityId = newDog.CityId,
+        WalkerId = null
+    };
+    dogs.Add(dog);
+    return Results.Created($"/api/dogs/{newId}", dog);
+});
+
 app.Run();

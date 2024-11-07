@@ -3,17 +3,8 @@ import { getDogs } from "./apiManager";
 import "./styling/DogList.css";
 import { DogDetails } from "./DogDetails";
 
-export const Dogs = () => {
-  const [dogs, setDogs] = useState([]);
+export const Dogs = ({ dogs }) => {
   const [selectedDog, setSelectedDog] = useState(null);
-
-  useEffect(() => {
-    getDogs()
-      .then(setDogs)
-      .catch(() => {
-        console.log("Failed to fetch dogs from the API");
-      });
-  }, []);
 
   const handleDogClick = (dog) => setSelectedDog(dog);
 
