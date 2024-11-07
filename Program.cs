@@ -80,6 +80,16 @@ List<City> cities = new List<City>
     }
 };
 
+List<Walker_Cities> walkerCities = new List<Walker_Cities>
+{
+    new Walker_Cities() { WalkerCityId = 1, WalkerId = 1, CityId = 1 },
+    new Walker_Cities() { WalkerCityId = 2, WalkerId = 1, CityId = 2 },
+    new Walker_Cities() { WalkerCityId = 3, WalkerId = 2, CityId = 2 },
+    new Walker_Cities() { WalkerCityId = 4, WalkerId = 3, CityId = 3 },
+    new Walker_Cities() { WalkerCityId = 5, WalkerId = 4, CityId = 1 }
+};
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -136,5 +146,23 @@ app.MapPost("/api/dogs", (DogDTO newDog) =>
     dogs.Add(dog);
     return Results.Created($"/api/dogs/{newId}", dog);
 });
+
+app.MapGet("/api/walkers", (int? cityId) =>
+{
+    List<Walker_CitiesDTO> results = walkerCities
+        .Where(wc => cityId == null || wc.CityId == cityId)
+        .Select(wc => new Walker_CitiesDTO
+        {
+            WalkerId = wc.WalkerId,
+            WalkerName = walkers.FirstOrDefault(w => w.Id == wc.WalkerId)?.Name ?? "Unknown",
+            CityId = wc.CityId,
+            CityName = cities.FirstOrDefault(c => c.Id == wc.CityId)?.Name ?? "Unknown"
+        })
+        .ToList();
+
+    return results;
+});
+
+
 
 app.Run();

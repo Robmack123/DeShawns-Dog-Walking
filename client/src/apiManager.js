@@ -19,3 +19,8 @@ export const addDog = async (dog) => {
     body: JSON.stringify(dog),
   }).catch(() => console.log("Failed to add dog"));
 };
+
+export const getWalkersByCity = async (cityId = "") => {
+  const res = await fetch(`/api/walkers${cityId ? `?cityId=${cityId}` : ""}`);
+  return res.json();
+};
