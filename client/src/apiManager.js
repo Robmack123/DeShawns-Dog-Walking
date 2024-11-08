@@ -24,3 +24,27 @@ export const getWalkersByCity = async (cityId = "") => {
   const res = await fetch(`/api/walkers${cityId ? `?cityId=${cityId}` : ""}`);
   return res.json();
 };
+
+export const getAvailableDogsForWalker = async (walkerId) => {
+  const res = await fetch(`/api/availableDogs?walkerId=${walkerId}`);
+  if (!res.ok) throw new Error("Failed to fetch available dogs for walker");
+  return res.json();
+};
+
+export const assignWalkerToDog = async (walkerId, dogId) => {
+  const res = await fetch(
+    `/api/assignWalker?walkerId=${walkerId}&dogId=${dogId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  if (!res.ok) throw new Error("Failed to assign walker to dog");
+  return res.json();
+};
+
+export const getWalkerById = async (walkerId) => {
+  const res = await fetch(`/api/walkers/${walkerId}`);
+  if (!res.ok) throw new Error("Failed to fetch walker by ID");
+  return res.json();
+};

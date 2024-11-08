@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { getCities, getWalkersByCity } from "./apiManager";
+import { useNavigate } from "react-router-dom";
+import "./styling/Walkers.css";
 
 export const Walkers = () => {
   const [walkers, setWalkers] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     getCities()
@@ -24,8 +27,11 @@ export const Walkers = () => {
       .catch(() => console.log("failed to fetch walkers for city"));
   };
 
+  const handleAddDogClick = (walkerId) => {
+    navigate(`/walkers/${walkerId}/dogs`);
+  };
   return (
-    <div>
+    <div className="walkers-container">
       <h1>Walkers</h1>
       <label>Filter by City: </label>
       <select value={selectedCity} onChange={handleCityChange}>
@@ -45,6 +51,9 @@ export const Walkers = () => {
             >
               <h3>{walker.walkerName}</h3>
               <p>City: {walker.cityName}</p>
+              <button onClick={() => handleAddDogClick(walker.walkerId)}>
+                Add Dog
+              </button>
             </div>
           ))
         ) : (
