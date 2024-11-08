@@ -6,14 +6,14 @@ List<Dog> dogs = new List<Dog>
     {
         Id = 1,
         Name = "Buddy",
-        WalkerId = 1,
+        WalkerId = null,
         CityId = 1
     },
     new Dog()
     {
         Id = 2,
         Name = "Max",
-        WalkerId = 2,
+        WalkerId = null,
         CityId = 2
     },
     new Dog()
@@ -27,7 +27,7 @@ List<Dog> dogs = new List<Dog>
     {
         Id = 4,
         Name = "Charlie",
-        WalkerId = 3,
+        WalkerId = null,
         CityId = 3
     }
 };
@@ -163,6 +163,65 @@ app.MapGet("/api/walkers", (int? cityId) =>
     return results;
 });
 
+app.MapGet("/api/availableDogs", (int walkerId) =>
+{
+    List<int> walkerCityIds = walkerCities
+        .Where(wc => wc.WalkerId == walkerId)
+        .Select(wc => wc.CityId)
+        .ToList();
 
+    List<DogDTO> availableDogs = dogs
+        .Where(d => walkerCityIds.Contains(d.CityId) && d.WalkerId == null)
+        .Select(d => new DogDTO
+        {
+           Id = d.Id,
+            Name = d.Name,
+            CityId = d.CityId,
+            CityName = cities.FirstOrDefault(c => c.Id == d.CityId)?.Name,
+            WalkerId = d.WalkerId
+        })
+        .ToList();
+    return availableDogs;
+});
+
+app.MapPut("/api/assignWalker", (int walkerId, int dogId) =>
+{
+   
+    Dog dog = dogs.FirstOrDefault(d => d.Id == dogId);
+    if (dog == null)
+    {
+        return Results.NotFound("Dog not found");
+    }
+
+    
+    dog.WalkerId = walkerId;
+
+    
+    return Results.Ok(new DogDTO
+    {
+        Id = dog.Id,
+        Name = dog.Name,
+        CityId = dog.CityId,
+        CityName = cities.FirstOrDefault(c => c.Id == dog.CityId)?.Name,
+        WalkerId = dog.WalkerId,
+        WalkerName = walkers.FirstOrDefault(w => w.Id == walkerId)?.Name
+    });
+});
+
+
+app.MapGet("/api/walkers/{walkerId}", (int walkerId) =>
+{
+    var walker = walkers.FirstOrDefault(w => w.Id == walkerId);
+    if (walker == null)
+    {
+        return Results.NotFound("Walker not found");
+    }
+
+    return Results.Ok(new
+    {
+        Id = walker.Id,
+        Name = walker.Name
+    });
+});
 
 app.Run();
