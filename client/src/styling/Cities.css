@@ -1,0 +1,45 @@
+.cities-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cities-container h1 {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.cities-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.cities-container li {
+  font-size: 1.2rem;
+  color: #555;
+  margin: 5px 0;
+}
+
+.cities-container input {
+  margin-top: 20px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.cities-container button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cities-container button:hover {
+  background-color: #45a049;
+}
