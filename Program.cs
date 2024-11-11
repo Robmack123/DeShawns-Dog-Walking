@@ -224,4 +224,26 @@ app.MapGet("/api/walkers/{walkerId}", (int walkerId) =>
     });
 });
 
+app.MapPost("/api/cities", (CityDTO cityDTO) =>
+{
+    int newId = cities.Any() ? cities.Max(c => c.Id) + 1 : 1;
+    var newCity = new City
+    {
+        Id = newId,
+        Name = cityDTO.Name
+    };
+    cities.Add(newCity);
+
+    // Map to CityDTO before returning
+    var cityResponse = new CityDTO
+    {
+        Id = newCity.Id,
+        Name = newCity.Name // Ensure Name is mapped correctly
+    };
+
+    return Results.Created($"/api/cities/{newId}", cityDTO); // Return CityDTO with Name populated
+});
+
+
+
 app.Run();

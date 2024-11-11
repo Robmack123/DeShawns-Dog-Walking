@@ -48,3 +48,13 @@ export const getWalkerById = async (walkerId) => {
   if (!res.ok) throw new Error("Failed to fetch walker by ID");
   return res.json();
 };
+
+export const addCity = async (name) => {
+  const res = await fetch("/api/cities", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error("Failed to add city");
+  return res.json();
+};
