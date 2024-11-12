@@ -301,6 +301,16 @@ app.MapPut("/api/walkers/{walkerId}", (int walkerId, WalkerDTO updatedWalker) =>
     return Results.Ok(new { Message = "Walker updated successfully" });
 });
 
+app.MapDelete("/api/dogs/{dogId}", (int dogId) =>
+{
+    Dog dog = dogs.FirstOrDefault(d => d.Id == dogId);
+    if (dog == null)
+    {
+        return Results.NotFound("Dog not found");
+    }
 
+    dogs.Remove(dog);
+    return Results.Ok(new { Message = "Dog deleted successfully"});
+});
 
 app.Run();
