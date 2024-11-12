@@ -68,3 +68,10 @@ export const updateWalker = async (walkerId, updatedWalker) => {
   if (!res.ok) throw new Error("Failed to update walker");
   return res.json();
 };
+export const deleteDog = async (dogId) => {
+  const res = await fetch(`/api/dogs/${dogId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete dog");
+  return res.json();
+};
