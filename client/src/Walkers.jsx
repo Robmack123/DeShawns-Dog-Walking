@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { getCities, getWalkersByCity } from "./apiManager";
+import { getCities, getWalkersByCity, deleteWalker } from "./apiManager";
 import { useNavigate } from "react-router-dom";
 import "./styling/Walkers.css";
 
 export const Walkers = () => {
   const [walkers, setWalkers] = useState([]);
+  const [allWalkers, setAllWalkers] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
   const navigate = useNavigate();
@@ -12,19 +13,40 @@ export const Walkers = () => {
   useEffect(() => {
     getCities()
       .then(setCities)
-      .catch(() => console.log("failed to fetch cities"));
+      .catch(() => console.log("Failed to fetch cities"));
 
-    getWalkersByCity()
-      .then(setWalkers)
-      .catch(() => console.log("failed to fetch walkers"));
+    fetchWalkers();
   }, []);
+
+  const fetchWalkers = () => {
+    getWalkersByCity()
+      .then((walkers) => {
+        const updatedWalkers = walkers.map((walker) => ({
+          ...walker,
+          cityNames:
+            walker.cityNames.length > 0
+              ? walker.cityNames
+              : ["No cities assigned"],
+        }));
+        setAllWalkers(updatedWalkers);
+        setWalkers(updatedWalkers);
+      })
+      .catch(() => console.log("Failed to fetch walkers"));
+  };
 
   const handleCityChange = (e) => {
     const cityId = e.target.value;
     setSelectedCity(cityId);
-    getWalkersByCity(cityId)
-      .then(setWalkers)
-      .catch(() => console.log("failed to fetch walkers for city"));
+    if (cityId === "") {
+      // If "All Cities" is selected, show all walkers
+      setWalkers(allWalkers);
+    } else {
+      // Filter walkers based on the selected city
+      const filteredWalkers = allWalkers.filter((walker) =>
+        walker.cityIds.includes(parseInt(cityId))
+      );
+      setWalkers(filteredWalkers);
+    }
   };
 
   const handleAddDogClick = (walkerId) => {
@@ -33,6 +55,14 @@ export const Walkers = () => {
 
   const handleEditWalkerClick = (walkerId) => {
     navigate(`/walkers/${walkerId}/edit`);
+  };
+
+  const handleRemoveWalker = (walkerId) => {
+    deleteWalker(walkerId)
+      .then(() => {
+        fetchWalkers(); // Refresh the list of walkers after deleting
+      })
+      .catch(() => console.log("Failed to delete walker"));
   };
 
   return (
@@ -50,17 +80,17 @@ export const Walkers = () => {
       <div className="walkers-list">
         {walkers.length > 0 ? (
           walkers.map((walker) => (
-            <div
-              key={`${walker.walkerId}-${walker.cityId}`}
-              className="walker-card"
-            >
-              <h3>{walker.walkerName}</h3>
-              <p>City: {walker.cityName}</p>
-              <button onClick={() => handleAddDogClick(walker.walkerId)}>
+            <div key={walker.id} className="walker-card">
+              <h3>{walker.name}</h3>
+              <p>Cities: {walker.cityNames.join(", ")}</p>
+              <button onClick={() => handleAddDogClick(walker.id)}>
                 Add Dog
               </button>
-              <button onClick={() => handleEditWalkerClick(walker.walkerId)}>
+              <button onClick={() => handleEditWalkerClick(walker.id)}>
                 Edit Walker
+              </button>
+              <button onClick={() => handleRemoveWalker(walker.id)}>
+                Remove Walker
               </button>
             </div>
           ))
