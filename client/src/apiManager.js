@@ -44,7 +44,7 @@ export const assignWalkerToDog = async (walkerId, dogId) => {
 };
 
 export const getWalkerById = async (walkerId) => {
-  const res = await fetch(`/api/walkers/${walkerId}`);
+  const res = await fetch(`/api/walkers/${walkerId}/details`);
   if (!res.ok) throw new Error("Failed to fetch walker by ID");
   return res.json();
 };
@@ -56,5 +56,15 @@ export const addCity = async (name) => {
     body: JSON.stringify({ name }),
   });
   if (!res.ok) throw new Error("Failed to add city");
+  return res.json();
+};
+
+export const updateWalker = async (walkerId, updatedWalker) => {
+  const res = await fetch(`/api/walkers/${walkerId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedWalker),
+  });
+  if (!res.ok) throw new Error("Failed to update walker");
   return res.json();
 };

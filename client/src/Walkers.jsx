@@ -30,6 +30,11 @@ export const Walkers = () => {
   const handleAddDogClick = (walkerId) => {
     navigate(`/walkers/${walkerId}/dogs`);
   };
+
+  const handleEditWalkerClick = (walkerId) => {
+    navigate(`/walkers/${walkerId}/edit`);
+  };
+
   return (
     <div className="walkers-container">
       <h1>Walkers</h1>
@@ -53,6 +58,9 @@ export const Walkers = () => {
               <p>City: {walker.cityName}</p>
               <button onClick={() => handleAddDogClick(walker.walkerId)}>
                 Add Dog
+              </button>
+              <button onClick={() => handleEditWalkerClick(walker.walkerId)}>
+                Edit Walker
               </button>
             </div>
           ))

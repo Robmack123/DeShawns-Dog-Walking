@@ -234,14 +234,71 @@ app.MapPost("/api/cities", (CityDTO cityDTO) =>
     };
     cities.Add(newCity);
 
-    // Map to CityDTO before returning
+   
     var cityResponse = new CityDTO
     {
         Id = newCity.Id,
-        Name = newCity.Name // Ensure Name is mapped correctly
+        Name = newCity.Name 
     };
 
-    return Results.Created($"/api/cities/{newId}", cityDTO); // Return CityDTO with Name populated
+    return Results.Created($"/api/cities/{newId}", cityDTO); 
+});
+
+app.MapGet("/api/walkers/{walkerId}/details", (int walkerId) =>
+{
+   
+    var walker = walkers.FirstOrDefault(w => w.Id == walkerId);
+    if (walker == null)
+    {
+        return Results.NotFound("Walker not found");
+    }
+
+  
+    var cityIds = walkerCities.Where(wc => wc.WalkerId == walkerId)
+                               .Select(wc => wc.CityId)
+                               .ToList();
+
+    var cityNames = cityIds.Select(cityId => cities.FirstOrDefault(c => c.Id == cityId)?.Name)
+                           .Where(name => !string.IsNullOrEmpty(name)) 
+                           .ToList();
+
+    var walkerDTO = new WalkerDTO
+    {
+        Id = walker.Id,
+        Name = walker.Name,
+        CityIds = cityIds,
+        CityNames = cityNames
+    };
+
+    return Results.Ok(walkerDTO);
+});
+
+
+
+app.MapPut("/api/walkers/{walkerId}", (int walkerId, WalkerDTO updatedWalker) =>
+{
+    Walker walker = walkers.FirstOrDefault(w => w.Id == walkerId);
+    if (walker == null)
+    {
+        return Results.NotFound("Walker not found");
+    }
+
+
+    walker.Name = updatedWalker.Name;
+    walkerCities.RemoveAll(wc => wc.WalkerId == walkerId); 
+
+    
+    foreach (var cityId in updatedWalker.CityIds)
+    {
+        walkerCities.Add(new Walker_Cities
+        {
+            WalkerId = walkerId,
+            CityId = cityId,
+            WalkerCityId = walkerCities.Count + 1 
+        });
+    }
+
+    return Results.Ok(new { Message = "Walker updated successfully" });
 });
 
 
