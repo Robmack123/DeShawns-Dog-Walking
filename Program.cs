@@ -147,21 +147,26 @@ app.MapPost("/api/dogs", (DogDTO newDog) =>
     return Results.Created($"/api/dogs/{newId}", dog);
 });
 
-app.MapGet("/api/walkers", (int? cityId) =>
+app.MapGet("/api/walkers", () =>
 {
-    List<Walker_CitiesDTO> results = walkerCities
-        .Where(wc => cityId == null || wc.CityId == cityId)
-        .Select(wc => new Walker_CitiesDTO
-        {
-            WalkerId = wc.WalkerId,
-            WalkerName = walkers.FirstOrDefault(w => w.Id == wc.WalkerId)?.Name ?? "Unknown",
-            CityId = wc.CityId,
-            CityName = cities.FirstOrDefault(c => c.Id == wc.CityId)?.Name ?? "Unknown"
-        })
-        .ToList();
+    var walkerList = walkers.Select(w => new WalkerDTO
+    {
+        Id = w.Id,
+        Name = w.Name,
+        CityIds = walkerCities
+            .Where(wc => wc.WalkerId == w.Id)
+            .Select(wc => wc.CityId)
+            .ToList(),
+        CityNames = walkerCities
+            .Where(wc => wc.WalkerId == w.Id)
+            .Select(wc => cities.FirstOrDefault(c => c.Id == wc.CityId)?.Name)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToList()
+    }).ToList();
 
-    return results;
+    return Results.Ok(walkerList);
 });
+
 
 app.MapGet("/api/availableDogs", (int walkerId) =>
 {
@@ -311,6 +316,25 @@ app.MapDelete("/api/dogs/{dogId}", (int dogId) =>
 
     dogs.Remove(dog);
     return Results.Ok(new { Message = "Dog deleted successfully"});
+});
+
+app.MapDelete("/api/walkers/{walkerId}", (int walkerId) =>
+{
+    var walker = walkers.FirstOrDefault(w => w.Id == walkerId);
+    if (walker == null)
+    {
+        return Results.NotFound("Walker not found");
+    }
+
+    walkers.Remove(walker);
+
+    dogs.Where(d => d.WalkerId == walkerId)
+        .ToList()
+        .ForEach(d => d.WalkerId = null);
+
+    walkerCities.RemoveAll(wc => wc.WalkerId == walkerId);
+
+    return Results.Ok(new { Message = "Walker deleted successfully" });
 });
 
 app.Run();
